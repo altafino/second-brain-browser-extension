@@ -6,7 +6,7 @@
   <title>Second Brain</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <div id="root">
@@ -20,7 +20,7 @@
     <div id="view-not-configured" class="view hidden">
       <div class="onboard-wrap">
         <div class="brand-large">
-          <img src="icons/icon.png" width="36" height="36" alt="">
+          <img src="/icons/icon.png" width="36" height="36" alt="">
           <span>Second Brain</span>
         </div>
         <p class="onboard-desc">Connect your Cloudflare Worker to start capturing pages and highlights to your second brain.</p>
@@ -32,7 +32,7 @@
     <div id="view-capture" class="view hidden">
       <header class="header">
         <div class="brand">
-          <img src="icons/icon.png" width="24" height="24" alt="">
+          <img src="/icons/icon.png" width="24" height="24" alt="">
           <span class="brand-name">Second Brain</span>
         </div>
         <button id="btn-settings" class="icon-btn" aria-label="Settings" title="Settings">
@@ -87,6 +87,6 @@
     </div>
 
   </div>
-  <script src="popup.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
