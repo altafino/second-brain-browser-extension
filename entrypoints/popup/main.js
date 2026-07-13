@@ -1,5 +1,3 @@
-'use strict';
-
 const $ = id => document.getElementById(id);
 
 const isMac = navigator.platform.toUpperCase().includes('MAC');
@@ -38,25 +36,32 @@ function truncate(str, max) {
   return str.length > max ? str.slice(0, max) + '…' : str;
 }
 
+function isRestrictedUrl(url) {
+  return ['chrome://', 'chrome-extension://', 'edge://', 'about:', 'moz-extension://']
+    .some(prefix => url.startsWith(prefix));
+}
+
+function openSetup() {
+  browser.tabs.create({ url: browser.runtime.getURL('/setup.html') });
+  window.close();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   applyModifierKeys();
 
   // 1. Load settings
-  const { workerUrl, authToken } = await chrome.storage.sync.get(['workerUrl', 'authToken']);
+  const { workerUrl, authToken } = await browser.storage.sync.get(['workerUrl', 'authToken']);
 
   if (!workerUrl || !authToken) {
     showView('view-not-configured');
-    $('btn-open-setup').addEventListener('click', () => {
-      chrome.tabs.create({ url: chrome.runtime.getURL('setup.html') });
-      window.close();
-    });
+    $('btn-open-setup').addEventListener('click', openSetup);
     return;
   }
 
   // 2. Get active tab
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
 
-  if (!tab?.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
+  if (!tab?.url || isRestrictedUrl(tab.url)) {
     showView('view-capture');
     $('page-title').textContent = 'This page cannot be captured';
     $('page-url').textContent = tab?.url || '';
@@ -69,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. Try to get selected text
   let selection = '';
   try {
-    const [result] = await chrome.scripting.executeScript({
+    const [result] = await browser.scripting.executeScript({
       target: { tabId: tab.id },
       func: () => window.getSelection().toString().trim(),
     });
@@ -142,8 +147,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function setupSettingsButton() {
-  $('btn-settings').addEventListener('click', () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL('setup.html') });
-    window.close();
-  });
+  $('btn-settings').addEventListener('click', openSetup);
 }

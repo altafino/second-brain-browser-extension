@@ -1,5 +1,3 @@
-'use strict';
-
 const $ = id => document.getElementById(id);
 
 function showStatus(type, message) {
@@ -20,7 +18,7 @@ function setLoading(loading) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Pre-fill saved settings if reconfiguring
-  const { workerUrl, authToken } = await chrome.storage.sync.get(['workerUrl', 'authToken']);
+  const { workerUrl, authToken } = await browser.storage.sync.get(['workerUrl', 'authToken']);
   if (workerUrl) $('worker-url').value = workerUrl;
   if (authToken) $('auth-token').value = authToken;
 
@@ -87,7 +85,7 @@ async function handleConnect() {
     const count = typeof data.count === 'number' ? data.count : null;
 
     // Save settings
-    await chrome.storage.sync.set({ workerUrl: rawUrl, authToken: token });
+    await browser.storage.sync.set({ workerUrl: rawUrl, authToken: token });
 
     // Show success
     $('form-section').classList.add('hidden');

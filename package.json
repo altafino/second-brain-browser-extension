@@ -1,0 +1,19 @@
+{
+  "name": "second-brain-browser-extension",
+  "version": "1.0.0",
+  "description": "Capture any page or highlighted text to your Second Brain Cloudflare Worker.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "wxt": "^0.20.6"
+  }
+}
