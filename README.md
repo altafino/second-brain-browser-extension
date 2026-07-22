@@ -25,32 +25,54 @@ The Worker is free to deploy (Cloudflare free tier), takes about 2 minutes via t
 
 ## Installation
 
-No app store required. Load the extension directly from source in about 60 seconds.
+No app store required. The extension is built with [WXT](https://wxt.dev), which produces builds for Chrome (Manifest V3) and Firefox (Manifest V2) from the same codebase.
+
+Build it once from source (requires [Node.js](https://nodejs.org) 20+):
+
+```bash
+git clone https://github.com/rahilp/second-brain-browser-extension.git
+cd second-brain-browser-extension
+pnpm install          # or: npm install
+pnpm build            # Chrome/Brave/Edge → .output/chrome-mv3
+pnpm build:firefox    # Firefox           → .output/firefox-mv2
+```
 
 ### Chrome / Brave
 
-1. Clone this repo:
-   ```bash
-   git clone https://github.com/rahilp/second-brain-browser-extension.git
-   ```
-2. Go to `chrome://extensions`
-3. Enable **Developer mode** (toggle in the top-right corner)
-4. Click **Load unpacked** and select the cloned folder
-5. The Second Brain icon appears in your toolbar — pin it for easy access
+1. Go to `chrome://extensions`
+2. Enable **Developer mode** (toggle in the top-right corner)
+3. Click **Load unpacked** and select the `.output/chrome-mv3` folder
+4. The Second Brain icon appears in your toolbar — pin it for easy access
 
 ### Microsoft Edge
 
 Same steps, but go to `edge://extensions` in step 2 and enable **Developer mode** from the left sidebar.
 
+### Firefox
+
+1. Go to `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on…**
+3. Select `.output/firefox-mv2/manifest.json`
+
+Temporary add-ons are removed when Firefox restarts. For a permanent install, run `pnpm zip:firefox` and either sign the zip via [addons.mozilla.org](https://addons.mozilla.org/developers/) or install it as-is in Firefox Developer Edition / ESR (with `xpinstall.signatures.required` set to `false` in `about:config`).
+
+### Development
+
+```bash
+pnpm dev              # live-reloading dev build in Chrome
+pnpm dev:firefox      # live-reloading dev build in Firefox
+```
+
 ### Staying up to date
 
-When a new version is released, pull the latest changes and reload the extension:
+When a new version is released, pull the latest changes and rebuild:
 
 ```bash
 git pull
+pnpm install && pnpm build   # or build:firefox
 ```
 
-Then go to `chrome://extensions` and click the reload icon on the Second Brain card.
+Then go to `chrome://extensions` and click the reload icon on the Second Brain card (Firefox temporary add-ons: click **Reload** in `about:debugging`).
 
 ---
 
@@ -85,7 +107,7 @@ Click the Second Brain icon in your toolbar (or press `Alt+Shift+B`).
 | `Alt+Shift+B` (Mac: `⌥ Shift B`) | Open the popup |
 | `Alt+Shift+S` (Mac: `⌥ Shift S`) | Quick capture — saves instantly, no popup |
 
-Quick capture shows a toast notification in the top-right corner of the page confirming the result. You can customise both shortcuts at `chrome://extensions/shortcuts`.
+Quick capture shows a toast notification in the top-right corner of the page confirming the result. You can customise both shortcuts at `chrome://extensions/shortcuts` (Firefox: `about:addons` → gear icon → **Manage Extension Shortcuts**).
 
 ### Capture results
 
@@ -123,18 +145,22 @@ Hashtags in the note are extracted as tags by the Worker. The `source` field is 
 | `storage` | Save your Worker URL and auth token locally |
 | `host_permissions: <all_urls>` | Make requests to your self-hosted Worker URL (which can be any domain) |
 
-Credentials are stored in `chrome.storage.sync` — they never leave your browser except in requests to your own Worker.
+Credentials are stored in `storage.sync` — they never leave your browser except in requests to your own Worker.
 
 ---
 
 ## File structure
 
 ```
-manifest.json      — Extension manifest (MV3)
-background.js      — Service worker: handles quick-capture command + toast injection
-popup.html/js/css  — Capture popup UI
-setup.html/js/css  — First-run setup and settings page
-icons/             — Extension icons
+wxt.config.ts             — WXT config: manifest, permissions, per-browser tweaks
+entrypoints/
+  background.js           — Background: handles quick-capture command + toast injection
+  popup/                  — Capture popup UI (index.html, main.js, style.css)
+  setup/                  — First-run setup and settings page
+public/
+  icon/                   — Extension icons (16/48/128)
+  icons/icon.png          — Logo used inside the UI pages
+.output/                  — Built extensions (chrome-mv3, firefox-mv2) — generated
 ```
 
 ---
